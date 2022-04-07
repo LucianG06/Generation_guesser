@@ -67,17 +67,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String? _name;
+  final _textName = TextEditingController();
+  final _textYear = TextEditingController();
   int? _birthYear;
   String _generation = '';
-  String? _errorTextName;
-  String? _errorTextYear;
+  bool _validateName = false;
+  bool _validateYear = false;
+
 
   void _calculateGeneration() {
       setState(() {
-        if (_birthYear == null) {
-          _errorTextYear = 'Please insert your birth year';
-        } else {
-          _errorTextYear = null;
+        if (_birthYear != null && _textName.text.isNotEmpty) {
           if (_birthYear! < 1946) {
             _generation = 'I don\'t know';
           } else if (_birthYear! < 1965) {
@@ -93,12 +93,6 @@ class _MyHomePageState extends State<MyHomePage> {
           } else {
             _generation = 'I don\'t know';
           }
-        }
-
-        if (_name == null) {
-          _errorTextName = 'Please insert your name';
-        } else {
-          _errorTextName = null;
         }
       });
   }
@@ -117,21 +111,22 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              controller: _textName,
               decoration: InputDecoration(
                   hintText: "Enter your name",
-                  errorText: _errorTextName,
+                  errorText: _validateName ? 'Please insert your name' : null
               ),
               onChanged: (enteredText) {
                 setState(() {
                   _name = enteredText;
-                  //_errorTextName = null;
                 });
               },
               ),
             TextField(
+              controller: _textYear,
               decoration: InputDecoration(
                   hintText: "Enter your birth year",
-                  errorText: _errorTextYear,
+                  errorText: _validateYear ? 'Please insert your birth year' : null,
               ),
               keyboardType: const TextInputType.numberWithOptions(
                   signed: false,
@@ -144,7 +139,6 @@ class _MyHomePageState extends State<MyHomePage> {
               onChanged: (enteredText) {
                 setState(() {
                   _birthYear = int.tryParse(enteredText) ?? 0;
-                  //_errorTextYear = null;
                 });
               },
             ),
@@ -154,6 +148,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
                 onPressed: () {
                   _calculateGeneration();
+                  _textName.text.isEmpty ? _validateName = true : _validateName = false;
+                  _textYear.text.isEmpty ? _validateYear = true : _validateYear = false;
                 },
                 child: const Text('Calculate your generation')
             ),
